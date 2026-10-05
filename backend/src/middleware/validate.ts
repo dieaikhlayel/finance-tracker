@@ -14,8 +14,11 @@ export function validate(schema: ZodSchema, source: Source = 'body') {
             }));
             throw new AppError(400, 'Validation failed', details);
         }
-        // Overwrite with the parsed value so defaults and coercions apply
-        (req as any)[source] = result.data;
+        if (source === 'query') {
+            Object.assign(req.query, result.data);
+        } else {
+            (req as any)[source] = result.data;
+        }
         next();
     };
 }

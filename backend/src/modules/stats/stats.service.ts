@@ -28,27 +28,8 @@ interface DateRange {
     to?: string;
 }
 
-function buildDateClause(range: DateRange, column = 't.date'): { sql: string; params: string[] } {
-    const clauses: string[] = [];
-    const params: string[] = [];
-
-    if (range.from) {
-        clauses.push(`${column} >= ?`);
-        params.push(range.from);
-    }
-    if (range.to) {
-        clauses.push(`${column} <= ?`);
-        params.push(range.to);
-    }
-
-    return {
-        sql: clauses.length ? `AND ${clauses.join(' AND ')}` : '',
-        params,
-    };
-}
-
 export async function getSummary(userId: number, range: DateRange): Promise<StatsSummary> {
-    const dateClause = buildDateClause(range);
+    const dateParams = [range.from ?? null, range.from ?? null, range.to ?? null, range.to ?? null];
 
     const [rows] = await pool.query<RowDataPacket[]>(
         `SELECT
@@ -56,8 +37,10 @@ export async function getSummary(userId: number, range: DateRange): Promise<Stat
        COALESCE(SUM(CASE WHEN type = 'EXPENSE' THEN amount ELSE 0 END), 0) AS total_expense,
        COUNT(*) AS transaction_count
      FROM transactions t
-     WHERE t.user_id = ? ${dateClause.sql}`,
-        [userId, ...dateClause.params],
+     WHERE t.user_id = ?
+       AND (? IS NULL OR t.date >= ?)
+       AND (? IS NULL OR t.date <= ?)`,
+        [userId, ...dateParams],
     );
 
     const row = rows[0] as
@@ -83,7 +66,7 @@ export async function getByCategory(
     type: TransactionType,
     range: DateRange,
 ): Promise<CategoryBreakdownItem[]> {
-    const dateClause = buildDateClause(range);
+    const dateParams = [range.from ?? null, range.from ?? null, range.to ?? null, range.to ?? null];
 
     const [rows] = await pool.query<RowDataPacket[]>(
         `SELECT
@@ -93,10 +76,12 @@ export async function getByCategory(
        COUNT(*)      AS count
      FROM transactions t
      JOIN categories c ON c.id = t.category_id
-     WHERE t.user_id = ? AND t.type = ? ${dateClause.sql}
+     WHERE t.user_id = ? AND t.type = ?
+       AND (? IS NULL OR t.date >= ?)
+       AND (? IS NULL OR t.date <= ?)
      GROUP BY c.id, c.name
      ORDER BY total DESC`,
-        [userId, type, ...dateClause.params],
+        [userId, type, ...dateParams],
     );
 
     return rows.map((row) => ({

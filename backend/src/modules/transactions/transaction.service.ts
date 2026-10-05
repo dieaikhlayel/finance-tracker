@@ -49,61 +49,37 @@ const SORT_MAP: Record<ListTransactionsQuery['sort'], string> = {
     amount_asc: 't.amount ASC, t.id ASC',
 };
 
-interface ListFilters {
-    userId: number;
-    search?: string;
-    type?: TransactionType;
-    categoryId?: number;
-    from?: string;
-    to?: string;
-}
-
-function buildWhere(filters: ListFilters): { sql: string; params: unknown[] } {
-    const clauses: string[] = ['t.user_id = ?'];
-    const params: unknown[] = [filters.userId];
-
-    if (filters.search) {
-        clauses.push('t.description LIKE ?');
-        params.push(`%${filters.search}%`);
-    }
-    if (filters.type) {
-        clauses.push('t.type = ?');
-        params.push(filters.type);
-    }
-    if (filters.categoryId) {
-        clauses.push('t.category_id = ?');
-        params.push(filters.categoryId);
-    }
-    if (filters.from) {
-        clauses.push('t.date >= ?');
-        params.push(filters.from);
-    }
-    if (filters.to) {
-        clauses.push('t.date <= ?');
-        params.push(filters.to);
-    }
-
-    return { sql: clauses.join(' AND '), params };
-}
-
 export async function listTransactions(
     userId: number,
     query: ListTransactionsQuery,
 ): Promise<TransactionListResult> {
     const { search, type, categoryId, from, to, page, limit, sort } = query;
 
-    const { sql: whereSql, params: whereParams } = buildWhere({
+    const searchPattern = search === undefined ? null : `%${search}%`;
+    const filters = [
         userId,
-        search,
-        type,
-        categoryId,
-        from,
-        to,
-    });
+        searchPattern,
+        searchPattern,
+        type ?? null,
+        type ?? null,
+        categoryId ?? null,
+        categoryId ?? null,
+        from ?? null,
+        from ?? null,
+        to ?? null,
+        to ?? null,
+    ];
 
     const [countRows] = await pool.query<RowDataPacket[]>(
-        `SELECT COUNT(*) AS total FROM transactions t WHERE ${whereSql}`,
-        whereParams,
+        `SELECT COUNT(*) AS total
+     FROM transactions t
+     WHERE t.user_id = ?
+       AND (? IS NULL OR t.description LIKE ?)
+       AND (? IS NULL OR t.type = ?)
+       AND (? IS NULL OR t.category_id = ?)
+       AND (? IS NULL OR t.date >= ?)
+       AND (? IS NULL OR t.date <= ?)`,
+        filters,
     );
     const total = Number(countRows[0]?.total ?? 0);
 
@@ -116,10 +92,15 @@ export async function listTransactions(
        t.type, t.amount, t.description, t.date, t.created_at, t.updated_at
      FROM transactions t
      JOIN categories c ON c.id = t.category_id
-     WHERE ${whereSql}
+     WHERE t.user_id = ?
+       AND (? IS NULL OR t.description LIKE ?)
+       AND (? IS NULL OR t.type = ?)
+       AND (? IS NULL OR t.category_id = ?)
+       AND (? IS NULL OR t.date >= ?)
+       AND (? IS NULL OR t.date <= ?)
      ORDER BY ${orderBy}
      LIMIT ? OFFSET ?`,
-        [...whereParams, limit, offset],
+        [...filters, limit, offset],
     );
 
     const items = rows.map(toTransaction);
