@@ -1,0 +1,1 @@
+export { getApiErrorMessage as extractErrorMessage } from '../api/axiosClient';
