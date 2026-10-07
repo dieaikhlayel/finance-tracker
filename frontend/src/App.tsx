@@ -121,13 +121,28 @@
 
 // export default App
 
+// import { BrowserRouter } from 'react-router-dom';
+// import { AppRoutes } from './routes';
+
+// export default function App() {
+//   return (
+//     <BrowserRouter>
+//       <AppRoutes />
+//     </BrowserRouter>
+//   );
+// }
+
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
+import { store } from './app/store';
 import { AppRoutes } from './routes';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </Provider>
   );
 }
