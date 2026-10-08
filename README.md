@@ -3,10 +3,6 @@
 
 Finance Tracker is a small full-stack portfolio application for recording income and expenses. It provides JWT-authenticated accounts, globally seeded categories, paginated and filterable transactions, and a dashboard that summarizes balances by category and month.
 
-## Screenshots
-
-> Add dashboard, transaction list, and transaction form screenshots here.
-
 ## Tech Stack
 
 - Backend: Node.js, TypeScript 5.9, Express 4.22, mysql2/promise 3.24, MySQL 8, Zod 4.6, bcrypt 6, and jsonwebtoken 9.
