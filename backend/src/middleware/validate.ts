@@ -17,7 +17,8 @@ export function validate(schema: ZodSchema, source: Source = 'body') {
         if (source === 'query') {
             Object.assign(req.query, result.data);
         } else {
-            (req as any)[source] = result.data;
+            const target = req as unknown as Record<Source, unknown>;
+            target[source] = result.data;
         }
         next();
     };

@@ -12,7 +12,10 @@ export function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
-    const [localError, setLocalError] = useState<string | null>(null);
+    const [localError, setLocalError] = useState<{
+        field: 'password' | 'confirm';
+        message: string;
+    } | null>(null);
 
     useEffect(() => {
         if (token) navigate('/', { replace: true });
@@ -29,11 +32,11 @@ export function RegisterPage() {
         setLocalError(null);
 
         if (password.length < 8) {
-            setLocalError('Password must be at least 8 characters');
+            setLocalError({ field: 'password', message: 'Password must be at least 8 characters' });
             return;
         }
         if (password !== confirm) {
-            setLocalError('Passwords do not match');
+            setLocalError({ field: 'confirm', message: 'Passwords do not match' });
             return;
         }
 
@@ -44,8 +47,6 @@ export function RegisterPage() {
     }
 
     const submitting = status === 'loading';
-    const shownError = localError ?? error;
-
     return (
         <div className="auth-card">
             <h1>Create an account</h1>
@@ -72,6 +73,7 @@ export function RegisterPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
+                    {error && <div className="form-error">{error}</div>}
                 </div>
                 <div className="form-field">
                     <label htmlFor="password">Password</label>
@@ -85,6 +87,9 @@ export function RegisterPage() {
                         minLength={8}
                         maxLength={72}
                     />
+                    {localError?.field === 'password' && (
+                        <div className="form-error">{localError.message}</div>
+                    )}
                 </div>
                 <div className="form-field">
                     <label htmlFor="confirm">Confirm password</label>
@@ -96,9 +101,10 @@ export function RegisterPage() {
                         onChange={(e) => setConfirm(e.target.value)}
                         required
                     />
+                    {localError?.field === 'confirm' && (
+                        <div className="form-error">{localError.message}</div>
+                    )}
                 </div>
-
-                {shownError && <div className="form-error">{shownError}</div>}
 
                 <button type="submit" className="btn-primary" disabled={submitting}>
                     {submitting ? 'Creating account…' : 'Create account'}

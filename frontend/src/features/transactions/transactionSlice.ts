@@ -7,6 +7,7 @@ import type {
     TransactionListResult,
     TransactionPayload,
 } from '../../types';
+import type { RootState } from '../../app/store';
 
 interface TransactionState {
     items: Transaction[];
@@ -96,6 +97,30 @@ export const deleteTransaction = createAsyncThunk(
     },
 );
 
+export const applyFiltersAndFetch = createAsyncThunk(
+    'transactions/applyFiltersAndFetch',
+    async (_: void, { getState, rejectWithValue }) => {
+        const { filters } = getState() as RootState;
+        const params: TransactionListParams = {
+            page: filters.page,
+            limit: filters.limit,
+            sort: filters.sort,
+        };
+
+        if (filters.search) params.search = filters.search;
+        if (filters.type) params.type = filters.type;
+        if (filters.categoryId !== '') params.categoryId = filters.categoryId;
+        if (filters.from) params.from = filters.from;
+        if (filters.to) params.to = filters.to;
+
+        try {
+            return await txApi.list(params);
+        } catch (err) {
+            return rejectWithValue(extractErrorMessage(err));
+        }
+    },
+);
+
 const transactionSlice = createSlice({
     name: 'transactions',
     initialState,
@@ -124,6 +149,22 @@ const transactionSlice = createSlice({
                 state.totalPages = action.payload.totalPages;
             })
             .addCase(fetchTransactions.rejected, (state, action) => {
+                state.listStatus = 'failed';
+                state.listError = (action.payload as string) ?? 'Failed to load transactions';
+            })
+            .addCase(applyFiltersAndFetch.pending, (state) => {
+                state.listStatus = 'loading';
+                state.listError = null;
+            })
+            .addCase(applyFiltersAndFetch.fulfilled, (state, action) => {
+                state.listStatus = 'succeeded';
+                state.items = action.payload.items;
+                state.total = action.payload.total;
+                state.page = action.payload.page;
+                state.limit = action.payload.limit;
+                state.totalPages = action.payload.totalPages;
+            })
+            .addCase(applyFiltersAndFetch.rejected, (state, action) => {
                 state.listStatus = 'failed';
                 state.listError = (action.payload as string) ?? 'Failed to load transactions';
             })

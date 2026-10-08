@@ -131,9 +131,17 @@ import { FilterBar } from '../filters/FilterBar';
 
 export function TransactionsPage() {
     const dispatch = useAppDispatch();
-    const { items, total, listStatus, listError } = useAppSelector((s) => s.transactions);
-    const { page, limit } = useAppSelector((s) => s.filters);
+    const { items, total, listStatus, listError, mutationStatus } = useAppSelector((s) => s.transactions);
+    const filters = useAppSelector((s) => s.filters);
+    const { page, limit } = filters;
     const totalPages = Math.ceil(total / limit) || 0;
+    const hasActiveFilters =
+        filters.search !== '' ||
+        filters.type !== '' ||
+        filters.categoryId !== '' ||
+        filters.from !== '' ||
+        filters.to !== '' ||
+        filters.sort !== 'date_desc';
 
     // Fetch on mount, and whenever the filters/pagination are already set
     // (e.g. user navigates back to this page).
@@ -167,7 +175,12 @@ export function TransactionsPage() {
 
             {listStatus === 'succeeded' && (
                 <>
-                    <TransactionList items={items} onDelete={handleDelete} />
+                    <TransactionList
+                        items={items}
+                        onDelete={handleDelete}
+                        hasActiveFilters={hasActiveFilters}
+                        deleteDisabled={mutationStatus === 'loading'}
+                    />
                     <Pagination
                         page={page}
                         totalPages={totalPages}

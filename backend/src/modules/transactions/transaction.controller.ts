@@ -9,6 +9,7 @@ import {
     updateTransaction,
     deleteTransaction,
 } from './transaction.service';
+import type { ListTransactionsQuery } from './transaction.schemas';
 
 function parseId(raw: unknown): number {
     if (typeof raw !== 'string') {
@@ -23,7 +24,8 @@ function parseId(raw: unknown): number {
 
 export const list = asyncHandler(async (req: Request, res: Response) => {
     const userId = getUserId(req);
-    const result = await listTransactions(userId, req.query as any);
+    // The route validation middleware has parsed this query before the handler runs.
+    const result = await listTransactions(userId, req.query as unknown as ListTransactionsQuery);
     res.status(200).json(result);
 });
 

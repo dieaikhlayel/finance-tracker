@@ -28,7 +28,10 @@ export function TransactionForm({
     );
     const [description, setDescription] = useState(initial?.description ?? '');
     const [date, setDate] = useState(initial?.date ?? todayIso());
-    const [localError, setLocalError] = useState<string | null>(null);
+    const [localError, setLocalError] = useState<{
+        field: 'amount' | 'category' | 'date';
+        message: string;
+    } | null>(null);
 
     // If the user switches type, clear the selected category if it doesn't match
     useEffect(() => {
@@ -47,15 +50,15 @@ export function TransactionForm({
 
         const parsedAmount = Number(amount);
         if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-            setLocalError('Amount must be a positive number');
+            setLocalError({ field: 'amount', message: 'Amount must be a positive number' });
             return;
         }
         if (!categoryId) {
-            setLocalError('Please choose a category');
+            setLocalError({ field: 'category', message: 'Please choose a category' });
             return;
         }
         if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-            setLocalError('Date must be in YYYY-MM-DD format');
+            setLocalError({ field: 'date', message: 'Date must be in YYYY-MM-DD format' });
             return;
         }
 
@@ -67,8 +70,6 @@ export function TransactionForm({
             date,
         });
     }
-
-    const shownError = localError ?? error;
 
     return (
         <form onSubmit={handleSubmit} className="tx-form">
@@ -110,6 +111,9 @@ export function TransactionForm({
                     required
                     placeholder="0.00"
                 />
+                {localError?.field === 'amount' && (
+                    <div className="form-error">{localError.message}</div>
+                )}
             </div>
 
             <div className="form-field">
@@ -127,6 +131,9 @@ export function TransactionForm({
                         </option>
                     ))}
                 </select>
+                {localError?.field === 'category' && (
+                    <div className="form-error">{localError.message}</div>
+                )}
             </div>
 
             <div className="form-field">
@@ -138,6 +145,9 @@ export function TransactionForm({
                     onChange={(e) => setDate(e.target.value)}
                     required
                 />
+                {localError?.field === 'date' && (
+                    <div className="form-error">{localError.message}</div>
+                )}
             </div>
 
             <div className="form-field">
@@ -152,7 +162,7 @@ export function TransactionForm({
                 />
             </div>
 
-            {shownError && <div className="form-error">{shownError}</div>}
+            {error && <div className="form-error">{error}</div>}
 
             <div className="form-actions">
                 <button type="button" className="btn-secondary" onClick={onCancel} disabled={submitting}>

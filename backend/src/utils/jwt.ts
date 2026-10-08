@@ -15,10 +15,15 @@ export function signToken(userId: number): string {
 export function verifyToken(token: string): JwtPayload {
     try {
         const decoded = jwt.verify(token, env.jwt.secret);
-        if (typeof decoded === 'string' || typeof (decoded as any).sub !== 'number') {
+        if (
+            typeof decoded === 'string' ||
+            typeof decoded !== 'object' ||
+            decoded === null ||
+            typeof decoded.sub !== 'number'
+        ) {
             throw new AppError(401, 'Invalid token payload');
         }
-        return { sub: (decoded as any).sub };
+        return { sub: decoded.sub };
     } catch (err) {
         if (err instanceof AppError) throw err;
         throw new AppError(401, 'Invalid or expired token');

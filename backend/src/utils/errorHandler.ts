@@ -9,6 +9,15 @@ interface ErrorBody {
   };
 }
 
+function hasErrorCode(err: unknown, code: string): boolean {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'code' in err &&
+    (err as { code?: unknown }).code === code
+  );
+}
+
 export function notFoundHandler(_req: Request, res: Response): void {
   const body: ErrorBody = { error: { message: 'Route not found' } };
   res.status(404).json(body);
@@ -29,7 +38,7 @@ export function errorHandler(
   }
 
   // MySQL duplicate entry -> 409
-  if (typeof err === 'object' && err !== null && (err as any).code === 'ER_DUP_ENTRY') {
+  if (hasErrorCode(err, 'ER_DUP_ENTRY')) {
     res.status(409).json({ error: { message: 'Resource already exists' } });
     return;
   }

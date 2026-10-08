@@ -65,9 +65,8 @@ export function LoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
+                    {error && <div className="form-error">{error}</div>}
                 </div>
-
-                {error && <div className="form-error">{error}</div>}
 
                 <button type="submit" className="btn-primary" disabled={submitting}>
                     {submitting ? 'Logging in…' : 'Log in'}

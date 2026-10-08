@@ -5,9 +5,10 @@ import type { Transaction } from '../../types';
 interface TransactionRowProps {
     transaction: Transaction;
     onDelete: (id: number) => void;
+    deleteDisabled: boolean;
 }
 
-export function TransactionRow({ transaction, onDelete }: TransactionRowProps) {
+export function TransactionRow({ transaction, onDelete, deleteDisabled }: TransactionRowProps) {
     const { id, type, amount, categoryName, description, date } = transaction;
     const isIncome = type === 'INCOME';
 
@@ -34,7 +35,12 @@ export function TransactionRow({ transaction, onDelete }: TransactionRowProps) {
                 <Link to={`/transactions/${id}/edit`} className="btn-link">
                     Edit
                 </Link>
-                <button type="button" className="btn-link danger" onClick={handleDelete}>
+                <button
+                    type="button"
+                    className="btn-link danger"
+                    onClick={handleDelete}
+                    disabled={deleteDisabled}
+                >
                     Delete
                 </button>
             </td>

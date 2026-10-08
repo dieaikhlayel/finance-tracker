@@ -21,8 +21,7 @@ export function DashboardPage() {
         dispatch(fetchSummary());
         dispatch(fetchByCategory(byCategoryType));
         dispatch(fetchMonthly(12));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch]);
+    }, [dispatch, byCategoryType]);
 
     return (
         <div className="dashboard">

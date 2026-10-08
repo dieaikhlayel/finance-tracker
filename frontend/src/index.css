@@ -267,6 +267,11 @@ p {
   border-radius: var(--radius);
 }
 
+.form-field .form-error {
+  padding: 0;
+  background: transparent;
+}
+
 .btn-primary {
   padding: 0.6rem 1rem;
   border: none;
