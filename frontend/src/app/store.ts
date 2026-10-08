@@ -29,10 +29,31 @@
 // export type RootState = ReturnType<typeof store.getState>;
 // export type AppDispatch = typeof store.dispatch;
 
+// import { configureStore } from '@reduxjs/toolkit';
+// import authReducer, { logout } from '../features/auth/authSlice';
+// import categoryReducer from '../features/categories/categorySlice';
+// import transactionReducer from '../features/transactions/transactionSlice';
+// import { setTokenGetter, setUnauthorizedHandler } from '../api/axiosClient';
+
+// export const store = configureStore({
+//     reducer: {
+//         auth: authReducer,
+//         categories: categoryReducer,
+//         transactions: transactionReducer,
+//     },
+// });
+
+// setTokenGetter(() => store.getState().auth.token);
+// setUnauthorizedHandler(() => store.dispatch(logout()));
+
+// export type RootState = ReturnType<typeof store.getState>;
+// export type AppDispatch = typeof store.dispatch;
+
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer, { logout } from '../features/auth/authSlice';
 import categoryReducer from '../features/categories/categorySlice';
 import transactionReducer from '../features/transactions/transactionSlice';
+import statsReducer from '../features/stats/statsSlice';
 import { setTokenGetter, setUnauthorizedHandler } from '../api/axiosClient';
 
 export const store = configureStore({
@@ -40,6 +61,7 @@ export const store = configureStore({
         auth: authReducer,
         categories: categoryReducer,
         transactions: transactionReducer,
+        stats: statsReducer,
     },
 });
 

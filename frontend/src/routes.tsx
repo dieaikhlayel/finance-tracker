@@ -125,6 +125,55 @@
 // }
 
 
+// import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+// import { Layout } from './components/Layout';
+// import { RequireAuth } from './features/auth/RequireAuth';
+// import { LoginPage } from './features/auth/LoginPage';
+// import { RegisterPage } from './features/auth/RegisterPage';
+// import { TransactionsPage } from './features/transactions/TransactionsPage';
+// import { TransactionFormPage } from './features/transactions/TransactionFormPage';
+
+// function Placeholder({ title }: { title: string }) {
+//     return <h1>{title}</h1>;
+// }
+
+// function PublicOnly() {
+//     const token = localStorage.getItem('auth_token');
+//     if (token) return <Navigate to="/" replace />;
+//     return <Outlet />;
+// }
+
+// function ProtectedLayout() {
+//     return (
+//         <Layout>
+//             <Outlet />
+//         </Layout>
+//     );
+// }
+
+// export function AppRoutes() {
+//     return (
+//         <Routes>
+//             <Route element={<PublicOnly />}>
+//                 <Route path="/login" element={<LoginPage />} />
+//                 <Route path="/register" element={<RegisterPage />} />
+//             </Route>
+
+//             <Route element={<RequireAuth />}>
+//                 <Route element={<ProtectedLayout />}>
+//                     <Route path="/" element={<Placeholder title="Dashboard" />} />
+//                     <Route path="/transactions" element={<TransactionsPage />} />
+//                     <Route path="/transactions/new" element={<TransactionFormPage />} />
+//                     <Route path="/transactions/:id/edit" element={<TransactionFormPage />} />
+//                 </Route>
+//             </Route>
+
+//             <Route path="*" element={<Navigate to="/" replace />} />
+//         </Routes>
+//     );
+// }
+
+
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { RequireAuth } from './features/auth/RequireAuth';
@@ -132,10 +181,7 @@ import { LoginPage } from './features/auth/LoginPage';
 import { RegisterPage } from './features/auth/RegisterPage';
 import { TransactionsPage } from './features/transactions/TransactionsPage';
 import { TransactionFormPage } from './features/transactions/TransactionFormPage';
-
-function Placeholder({ title }: { title: string }) {
-    return <h1>{title}</h1>;
-}
+import { DashboardPage } from './features/dashboard/DashboardPage';
 
 function PublicOnly() {
     const token = localStorage.getItem('auth_token');
@@ -161,7 +207,7 @@ export function AppRoutes() {
 
             <Route element={<RequireAuth />}>
                 <Route element={<ProtectedLayout />}>
-                    <Route path="/" element={<Placeholder title="Dashboard" />} />
+                    <Route path="/" element={<DashboardPage />} />
                     <Route path="/transactions" element={<TransactionsPage />} />
                     <Route path="/transactions/new" element={<TransactionFormPage />} />
                     <Route path="/transactions/:id/edit" element={<TransactionFormPage />} />
