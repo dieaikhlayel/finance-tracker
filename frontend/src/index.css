@@ -744,3 +744,52 @@ p {
 .legend-swatch.expense {
   background: var(--danger);
 }
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.filter-search {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .filter-search {
+    grid-column: span 1;
+  }
+}
+
+.filter-bar .form-field {
+  margin: 0;
+}
+
+.filter-bar label {
+  font-size: 0.75rem;
+}
+
+.filter-bar input,
+.filter-bar select {
+  font-size: 0.875rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.filter-clear {
+  align-self: end;
+  justify-self: start;
+  font-size: 0.85rem;
+}
